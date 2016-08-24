@@ -1,16 +1,18 @@
 <ivy-module version="2.0" xmlns:xsi="http://www.w3.org/2001/XmlSchema-instance">
     <info organisation="hotmeatballsoup" module="fizzbuzz-model" revision="1.0" />
-    <configurations defaultconfmapping="default">
+    <configurations>
         <conf name="compile" description="provides compile-time deps" />
-        <conf name="runtime" description="provides runtime deps" />
-        <conf name="test" description="test deps" />
-        <conf name="publish" description="publish" />
-        <conf name="default" description="default" />
+        <conf name="runtime" description="provides runtime deps" extends="compile" />
+        <conf name="test"    description="test deps" extends="runtime" />
+        <conf name="master"  description="Used for compliance with Maven repos"/>
+        <conf name="default" description="Used for compliance with Maven repos"/>
     </configurations>
     <publications>
         <artifact name="fizzbuzz-model" type="jar" ext="jar"/>
         <artifact name="fizzbuzz-model" type="pom" ext="pom"/>
     </publications>
     <dependencies>
+        <!-- Test dependencies -->
+        <dependency org="junit" name="junit" rev="latest.release" conf="test->default"/>
     </dependencies>
 </ivy-module>

@@ -3,10 +3,10 @@ A simple model to be published to the local Ivy cache.
 
 ## Build & Publish Locally
 1. Clone this repo
-2. Make sure you have Ant and Ivy installed correctly; if not follow the steps below under the **Ant/Ivy Setup** section
+2. Make sure you have Ant installed correctly
 3. In a terminal, navigate to the cloned directory
-4. Run `ant local-publish`
-5. Inspect your local Ivy cache (typically `~/.ivy2/cache/hotmeatballsoup/fizzbuzz-model/`) to verify it has been published
+4. Run `ant publish`
+5. Inspect your local Ivy repository (`~/.ivy2/local/hotmeatballsoup/fizzbuzz-model`) to verify it has been published
 6. Now, go to the [**fizzbuzz-app**](https://github.com/hotmeatballsoup/fizzbuzz-app) that depends on this model and follow the instructions in its README
 
 ## Ant/Ivy Setup
@@ -23,14 +23,6 @@ If nothing shows up, navigate to this cloned repo and run `ant clean`. If you ge
 Now verify that `echo $ANT_HOME` produces successful output.
 
 ### Ivy
-Run a `ls -al` on your Ant lib directory like so:
 
-> ls -al $ANT_HOME/lib
+Ivy will be automatically installed by the build if it does not exist.
 
-Look for an Ivy jar, such as `ivy-2.4.0.jar`. If you don't see one, run
-
-1. `curl -O "http://www.webhostingjams.com/mirror/apache//ant/ivy/2.4.0/apache-ivy-2.4.0-bin-with-deps.tar.gz"`
-2. `tar -xvf apache-ivy-2.4.0-bin-with-deps.tar.gz`
-3. Copy all the jars inside of it to `$ANT_HOME/lib`
-
-If something gets botched in that process, you can just manually download the archive directly from Ivy's [download site](http://ant.apache.org/ivy/download.cgi), just make sure to get the archive "with deps".

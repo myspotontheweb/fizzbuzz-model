@@ -1,22 +1,14 @@
 <project name="fizzbuzz-model" default="publish" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant" >
-    <taskdef name="ivy-configure" classname="org.apache.ivy.ant.IvyConfigure" />
-    <taskdef name="ivy-resolve" classname="org.apache.ivy.ant.IvyResolve" />
-    <taskdef name="ivy-retrieve" classname="org.apache.ivy.ant.IvyRetrieve" />
-    <taskdef name="ivy-cleancache" classname="org.apache.ivy.ant.IvyCleanCache" />
 
-    <ivy:settings file="ivy-settings.xml" id="ivy.instance" />
+    <property name="target.release" value="1.0"/>
 
-    <path id="build.class.path">
-        <fileset dir="lib/main">
-            <include name="**/*.jar" />
-        </fileset>
-    </path>
+    <available classname="org.apache.ivy.Main" property="ivy.installed"/> 
 
-    <target name="clean">
-        <delete dir="dist" quiet="true" />
-        <delete dir="build" quiet="true" />
-        <delete dir="gen" quiet="true" />
-  	</target>
+    <target name="install-ivy" unless="ivy.installed">
+        <mkdir dir="${user.home}/.ant/lib"/>
+        <get dest="${user.home}/.ant/lib/ivy.jar" src="http://search.maven.org/remotecontent?filepath=org/apache/ivy/ivy/2.4.0/ivy-2.4.0.jar"/>
+        <fail message="Ivy has been installed. Run the build again"/>
+    </target>
 
     <target name="init" depends="clean">
     		<mkdir dir="build/main" />
@@ -24,33 +16,44 @@
     		<mkdir dir="gen" />
   	</target>
 
-    <target name="resolve">
-  		<delete>
-  			<fileset dir="lib/main" includes="*.jar" />
-  		</delete>
-  		<ivy:resolve file="ivy.xml" conf="compile" />
-  		<ivy:retrieve pattern="lib/main/[artifact]-[type]-[revision].[ext]" conf="compile" />
+    <target name="resolve" depends="install-ivy">
+  		<ivy:resolve/>
+
+      <ivy:cachepath pathid="compile.path" conf="compile"/>
+      <ivy:cachepath pathid="test.path"    conf="test"/>
   	</target>
 
     <target name="compile" depends="init,resolve">
-        <javac destdir="build/main">
-            <src path="src/main/java" />
-            <classpath>
-                <path refid="build.class.path" />
-                <pathelement path="build/main" />
-            </classpath>
-        </javac>
+        <javac srcdir="src/main/java" destdir="build/main" includeantruntime="false" debug="true" classpathref="compile.path"/>
     </target>
 
     <target name="dist" depends="clean,compile">
-        <jar jarfile="dist/fizzbuz-model.jar" basedir="build/main" />
+        <jar jarfile="dist/fizzbuzz-model.jar" basedir="build/main" />
   	</target>
 
-    <target name="local-publish" depends="clean,dist">
-        <copy file="dist/fizzbuz-model.jar" tofile="dist/fizzbuzz-model-1.0.0-SNAPSHOT.jar" />
-        <ivy:makepom ivyfile="ivy.xml" pomfile="dist/fizzbuzz-model-1.0.0-SNAPSHOT.pom" />
-        <ivy:publish resolver="local" pubrevision="1.0.0-SNAPSHOT" >
-            <artifacts pattern="dist/[artifact]-[revision].[ext]" />
+    <target name="publish" depends="clean,dist">
+ 
+        <!-- Determine build number from previously published revisions -->
+        <ivy:buildnumber resolver="local" organisation="${ivy.organisation}" module="${ivy.module}" revision="${target.release}"/>
+
+        <!-- Resolve ivy dependencies and create a Maven POM file -->
+        <ivy:deliver deliverpattern="dist/ivy.xml" pubrevision="${ivy.new.revision}" status="release"/>
+        <ivy:makepom ivyfile="dist/ivy.xml" pomfile="dist/fizzbuzz-model.pom" />
+
+        <!-- Publish the local repo. Defaults to ~/.ivy2/local -->
+        <ivy:publish resolver="local" pubrevision="${ivy.new.revision}" >
+            <artifacts pattern="dist/[artifact].[ext]" />
         </ivy:publish>
   	</target>
+
+   <target name="clean">
+        <delete dir="dist" quiet="true" />
+        <delete dir="build" quiet="true" />
+        <delete dir="gen" quiet="true" />
+  	</target>
+
+   <target name="clean-all" depends="clean">
+     <ivy:cleancache/>
+  	</target>
+
 </project>
