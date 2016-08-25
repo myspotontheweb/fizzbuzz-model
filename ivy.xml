@@ -5,13 +5,17 @@
         <conf name="runtime" description="provides runtime deps" extends="compile" />
         <conf name="test"    description="test deps" extends="runtime" />
         <conf name="master"  description="Used for compliance with Maven repos"/>
-        <conf name="default" description="Used for compliance with Maven repos"/>
+        <conf name="POM"     description="Used for compliance with Maven repos"/>
+        <conf name="default" description="Used for compliance with Maven repos" extends="compile,master"/>
     </configurations>
     <publications>
-        <artifact name="fizzbuzz-model" type="jar" ext="jar"/>
-        <artifact name="fizzbuzz-model" type="pom" ext="pom"/>
+        <artifact name="fizzbuzz-model" type="jar" ext="jar" conf="master"/>
+        <artifact name="fizzbuzz-model" type="pom" ext="pom" conf="POM"/>
     </publications>
     <dependencies>
+        <!-- Compile dependencies -->
+        <dependency org="log4j" name="log4j" rev="1.2.17" conf="compile->default"/>
+
         <!-- Test dependencies -->
         <dependency org="junit" name="junit" rev="latest.release" conf="test->default"/>
     </dependencies>

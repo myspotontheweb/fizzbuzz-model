@@ -1,4 +1,4 @@
-package hotmeatballsoup.fizzbuz.model;
+package hotmeatballsoup.fizzbuzz.model;
 
 /**
  * A simple data model.
